@@ -8,6 +8,7 @@ call plug#begin('~/.vim/plugged')
 	Plug 'scrooloose/nerdtree'
 	Plug 'vim-syntastic/syntastic'
 	Plug 'rust-lang/rust.vim'
+	Plug 'Valloric/YouCompleteMe'
 call plug#end()
 
 " Mostly taken from https://github.com/amix/vimrc/blob/master/vimrcs/basic.vim
@@ -339,6 +340,14 @@ let g:syntastic_check_on_wq = 0
 
 " Rust
 let g:syntastic_rust_checkers=['rustc']
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => YCM config
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:ycm_rust_src_path = '~/.rustup/toolchains/stable-armv7-unknown-linux-gnueabihf/lib/rustlib/src/rust/src'
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Helper functions
