@@ -1,27 +1,30 @@
 " Get Plugins
-call plug#begin('~/.vim/plugged')
-	Plug 'connor-broxton/peaksea'
-	Plug 'vim-scripts/mru.vim'
-	Plug 'itchyny/lightline.vim'
+call plug#begin('~/.config/nvim/plugged')
+	Plug 'vim-scripts/mru.vim', {'on': 'MRU'}
+	Plug 'vim-airline/vim-airline'
 	Plug 'tpope/vim-fugitive'
 	Plug 'maxbrunsfeld/vim-yankstack'
-	Plug 'scrooloose/nerdtree'
-	Plug 'vim-syntastic/syntastic'
-	Plug 'rust-lang/rust.vim'
-	Plug 'Valloric/YouCompleteMe'
+	Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
+	Plug 'neomake/neomake'
+	Plug 'rust-lang/rust.vim', {'for': 'rust'}
+	Plug 'rakr/vim-one'
+	if has('nvim')
+		Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+	else
+		Plug 'Shougo/deoplete.nvim'
+		Plug 'roxma/nvim-yarp'
+		Plug 'roxma/vim-hug-neovim-rpc'
+	endif
+	Plug 'sebastianmarkow/deoplete-rust', {'for': 'rust'}
 call plug#end()
 
-" Mostly taken from https://github.com/amix/vimrc/blob/master/vimrcs/basic.vim
+" Partly taken from https://github.com/amix/vimrc/blob/master/vimrcs/basic.vim
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Sets how many lines of history VIM has to remember
 set history=500
-
-" Enable filetype plugins
-filetype plugin on
-filetype indent on
 
 " Set to auto read when a file is changed from the outside
 set autoread
@@ -44,12 +47,6 @@ command W w !sudo tee % > /dev/null
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Set 7 lines to the cursor - when moving vertically using j/k
 set so=7
-
-" Avoid garbled characters in Chinese language windows OS
-let $LANG='en' 
-set langmenu=en
-source $VIMRUNTIME/delmenu.vim
-source $VIMRUNTIME/menu.vim
 
 " Turn on the WiLd menu
 set wildmenu
@@ -104,10 +101,11 @@ set novisualbell
 set t_vb=
 set tm=500
 
-" Add a bit extra margin to the left
-set foldcolumn=1
+" Enable line numbers
+set number
 
-let g:tablineclosebutton=1
+" Add some extra margin to the left
+set foldcolumn=1
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -116,12 +114,7 @@ let g:tablineclosebutton=1
 
 " Color scheme
 set background=dark
-colorscheme peaksea
-
-
-
-" Enable syntax highlighting
-syntax enable
+colorscheme one
 
 " Set utf8 as standard encoding
 set encoding=utf8
@@ -132,17 +125,21 @@ set ffs=unix,dos,mac
 " Set 256 colours
 set t_Co=256
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Files, backups and undo
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" ***** Don't think I want any of this *****
-
-" Turn backup off, since most stuff is in SVN, git et.c anyway...
-" set nobackup
-" set nowb
-" set noswapfile
+"Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
+"If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
+"(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
+if (empty($TMUX))
+  if (has("nvim"))
+    "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
+    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+  endif
+  "For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+  "Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
+  " < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
+  if (has("termguicolors"))
+    set termguicolors
+  endif
+endif
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -187,8 +184,9 @@ map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
-" Close the current buffer
-map <leader>bd :Bclose<cr>:tabclose<cr>gT
+" Close the syntastic window if open and current buffer, useful when doing deoplete go to definition
+map <leader>bd :lclose<cr>:Bclose<cr>
+":tabclose<cr>gT
 
 " Close all the buffers
 map <leader>ba :bufdo bd<cr>
@@ -227,16 +225,6 @@ endtry
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 
 
-""""""""""""""""""""""""""""""
-" => Status line
-""""""""""""""""""""""""""""""
-" Always show the status line
-set laststatus=2
-
-" Format the status line
-set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l\ \ Column:\ %c
-
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Editing mappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -270,14 +258,6 @@ map <leader>s? z=
 " Toggle paste mode on and off
 map <leader>pp :setlocal paste!<cr>
 
-" fix meta-keys which generate <Esc>a .. <Esc>z
-let c='a'
-while c <= 'z'
-  exec "set <M-".toupper(c).">=\e".c
-  exec "imap \e".c." <M-".toupper(c).">"
-  let c = nr2char(1+char2nr(c))
-endw
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => MRU config
@@ -285,36 +265,6 @@ endw
 
 let MRU_Max_Entries = 400
 map <leader>f :MRU<CR>
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => lightline config
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-let g:lightline = {
-      \ 'colorscheme': 'wombat',
-      \ }
-
-let g:lightline = {
-      \ 'colorscheme': 'wombat',
-      \ 'active': {
-      \   'left': [ ['mode', 'paste'],
-      \             ['fugitive', 'readonly', 'filename', 'modified'] ],
-      \   'right': [ [ 'lineinfo' ], ['percent'] ]
-      \ },
-      \ 'component': {
-      \   'readonly': '%{&filetype=="help"?"":&readonly?"🔒":""}',
-      \   'modified': '%{&filetype=="help"?"":&modified?"+":&modifiable?"":"-"}',
-      \   'fugitive': '%{exists("*fugitive#head")?fugitive#head():""}'
-      \ },
-      \ 'component_visible_condition': {
-      \   'readonly': '(&filetype!="help"&& &readonly)',
-      \   'modified': '(&filetype!="help"&&(&modified||!&modifiable))',
-      \   'fugitive': '(exists("*fugitive#head") && ""!=fugitive#head())'
-      \ },
-      \ 'separator': { 'left': ' ', 'right': ' ' },
-      \ 'subseparator': { 'left': ' ', 'right': ' ' }
-      \ }
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -330,23 +280,47 @@ map <leader>nf :NERDTreeFind<cr>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Syntastic config
+" => Neomake config
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
+" When reading a buffer (after 1s), and when writing.
+call neomake#configure#automake('rw', 1000)
 
-" Rust
-let g:syntastic_rust_checkers=['rustc']
+" Open location list automatically
+"let g:neomake_open_list = 2
+
+" Rust maker
+let g:neomake_rust_enabled_makers = ['rustc']
+
+augroup my_neomake_signs
+	au!
+	autocmd ColorScheme *
+		\ hi NeomakeErrorSign ctermfg=red |
+		\ hi NeomakeWarningSign ctermfg=yellow
+augroup END
+
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => YCM config
+" => Airline config
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-let g:ycm_rust_src_path = '~/.rustup/toolchains/stable-armv7-unknown-linux-gnueabihf/lib/rustlib/src/rust/src'
+let g:airline_theme='one'
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Deoplete config
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+""" deoplete-rust config
+let g:deoplete#sources#rust#racer_binary=$HOME.'/.cargo/bin/racer'
+let g:deoplete#sources#rust#rust_source_path=system("rustc --print sysroot | awk '{printf $0}'").'/lib/rustlib/src/rust/src'
+
+" Use deoplete.
+let g:deoplete#enable_at_startup = 1
+
+" close preview window on leaving the insert mode
+autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

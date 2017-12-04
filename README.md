@@ -1,12 +1,12 @@
-First install vim-plug in .vim/autoload, open .vimrc and run :PlugInstall
+## Install
+
+1) Install vim-plug in ~/.config/nvim/autoload
+2) Copy init.vim to ~/.config/nvim/
+3) Run :PlugInstall
 
 
-### Configure Rust support
+## Configure Rust support
 
 	rustup default stable
 	rustup component add rust-src
-
-
-### Configure YouCompleteMe
-
-	./install.py --clang-completer --rust-completer --build-dir ~/ycm_build/
+	cargo install racer
