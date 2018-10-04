@@ -107,6 +107,9 @@ set number
 " Add some extra margin to the left
 set foldcolumn=1
 
+" Enable colour highlighting for cursor line
+set cursorline
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Colors and Fonts
