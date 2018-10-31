@@ -322,7 +322,7 @@ let g:deoplete#sources#rust#racer_binary=$HOME.'/.cargo/bin/racer'
 let g:deoplete#sources#rust#rust_source_path=system("rustc --print sysroot | awk '{printf $0}'").'/lib/rustlib/src/rust/src'
 
 """ doplete-clang config
-let g:deoplete#sources#clang#libclang_path="/usr/lib/llvm-6.0/lib/libclang.so"
+let g:deoplete#sources#clang#libclang_path="/usr/lib/libclang.so"
 let g:deoplete#sources#clang#clang_header="/usr/include/llvm"
 
 " Use deoplete.
