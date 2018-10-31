@@ -16,6 +16,8 @@ call plug#begin('~/.config/nvim/plugged')
 		Plug 'roxma/vim-hug-neovim-rpc'
 	endif
 	Plug 'sebastianmarkow/deoplete-rust', {'for': 'rust'}
+	Plug 'zchee/deoplete-clang', {'for': ['c', 'cpp']} 
+	Plug 'Shougo/neoinclude.vim', {'for': ['c', 'cpp']} 
 call plug#end()
 
 " Partly taken from https://github.com/amix/vimrc/blob/master/vimrcs/basic.vim
@@ -290,7 +292,7 @@ map <leader>nf :NERDTreeFind<cr>
 call neomake#configure#automake('rw', 1000)
 
 " Open location list automatically
-"let g:neomake_open_list = 2
+let g:neomake_open_list = 2
 
 " Rust maker
 let g:neomake_rust_enabled_makers = ['rustc']
@@ -318,6 +320,10 @@ let g:airline_theme='one'
 """ deoplete-rust config
 let g:deoplete#sources#rust#racer_binary=$HOME.'/.cargo/bin/racer'
 let g:deoplete#sources#rust#rust_source_path=system("rustc --print sysroot | awk '{printf $0}'").'/lib/rustlib/src/rust/src'
+
+""" doplete-clang config
+let g:deoplete#sources#clang#libclang_path="/usr/lib/llvm-6.0/lib/libclang.so"
+let g:deoplete#sources#clang#clang_header="/usr/include/llvm"
 
 " Use deoplete.
 let g:deoplete#enable_at_startup = 1
