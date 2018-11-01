@@ -16,7 +16,7 @@ call plug#begin('~/.config/nvim/plugged')
 		Plug 'roxma/vim-hug-neovim-rpc'
 	endif
 	Plug 'sebastianmarkow/deoplete-rust', {'for': 'rust'}
-	Plug 'zchee/deoplete-clang', {'for': ['c', 'cpp']} 
+	Plug 'Shougo/deoplete-clangx', {'for': ['c', 'cpp']} 
 	Plug 'Shougo/neoinclude.vim', {'for': ['c', 'cpp']} 
 call plug#end()
 
@@ -296,6 +296,9 @@ let g:neomake_open_list = 2
 
 " Rust maker
 let g:neomake_rust_enabled_makers = ['rustc']
+
+let g:neomake_c_enabled_makers = ['clang']
+let g:neomake_cpp_enabled_makers = ['clang']
 
 augroup my_neomake_signs
 	au!
