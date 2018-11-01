@@ -16,7 +16,7 @@ call plug#begin('~/.config/nvim/plugged')
 		Plug 'roxma/vim-hug-neovim-rpc'
 	endif
 	Plug 'sebastianmarkow/deoplete-rust', {'for': 'rust'}
-	Plug 'zchee/deoplete-clang', {'for': ['c', 'cpp']} 
+	Plug 'Shougo/deoplete-clangx', {'for': ['c', 'cpp']} 
 	Plug 'Shougo/neoinclude.vim', {'for': ['c', 'cpp']} 
 call plug#end()
 
@@ -303,6 +303,9 @@ let g:neomake_open_list = 2
 " Rust maker
 let g:neomake_rust_enabled_makers = ['rustc']
 
+let g:neomake_c_enabled_makers = ['clang']
+let g:neomake_cpp_enabled_makers = ['clang']
+
 augroup my_neomake_signs
 	au!
 	autocmd ColorScheme *
@@ -328,7 +331,7 @@ let g:deoplete#sources#rust#racer_binary=$HOME.'/.cargo/bin/racer'
 let g:deoplete#sources#rust#rust_source_path=system("rustc --print sysroot | awk '{printf $0}'").'/lib/rustlib/src/rust/src'
 
 """ doplete-clang config
-let g:deoplete#sources#clang#libclang_path="/usr/lib/llvm-6.0/lib/libclang.so"
+let g:deoplete#sources#clang#libclang_path="/usr/lib/libclang.so"
 let g:deoplete#sources#clang#clang_header="/usr/include/llvm"
 
 " Use deoplete.
