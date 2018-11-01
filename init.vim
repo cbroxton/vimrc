@@ -242,6 +242,12 @@ nmap <M-k> mz:m-2<cr>`z
 vmap <M-j> :m'>+<cr>`<my`>mzgv`yo`z
 vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Terminal emulator mappings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+map ` :sp<cr><C-w>j:terminal<cr>i
+tnoremap <Esc> <C-\><C-n>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Spell checking
